@@ -7,8 +7,22 @@ export bool print_argv_of_pid(const char *start_pointer,
 }
 
 export bool get_argv_of_pid(const struct GetArgvOptions *options,
-                            struct ArgvResult *retVal) {
-  // irrelevant to bug
+                            struct ArgvResult *result) {
+  int mib[3] = {CTL_KERN, KERN_PROCARGS2, 0};
+  size_t size = 0;
+  unsigned long argmax = 1024 * 1024;
+  mib[2] = options->pid;
+
+  result->buffer = (char *)malloc(argmax);
+  if (result->buffer == NULL) {
+    error_pre_malloc();
+  }
+  size = (size_t)argmax;
+  if (sysctl(mib, 3, result->buffer, &size, NULL, 0) == -1) {
+    errno = (getpgid(options->pid) < 0) ? ESRCH : EPERM;
+    error_post_malloc(result);
+  }
+  // remainder removed, irrelevant
   return true;
 }
 
