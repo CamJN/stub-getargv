@@ -1,15 +1,8 @@
 CC				:= /usr/bin/clang
 LIB_DIR				:= lib
 SRC_DIR				:= src
-LIB_OBJ_DIR			:= lib_obj
+LIB_OBJ_DIR			:= obj
 PREFIX				:= /usr/local
-
-MACOS_VER_NUM			:= $(shell bash -c 'cat <(sw_vers -productVersion) <(xcrun --show-sdk-version) | sort -V | head -1')
-MACOS_VER_MAJOR			:= $(shell echo $(MACOS_VER_NUM) | cut -f1 -d.)
-MACOS_VER_MINOR			:= $(shell echo $(MACOS_VER_NUM) | cut -f2 -d.)
-export MACOSX_DEPLOYMENT_TARGET := $(MACOS_VER_MAJOR).$(MACOS_VER_MINOR)
-ARCH				:= $(shell uname -m)
-PAGE_SIZE			:= $(shell printf '%x\n' $(shell sysctl -n hw.pagesize))
 
 VERSION				:= 0.1
 COMPAT_VERSION			:= $(shell echo $(VERSION) | cut -f1 -d.).0
@@ -19,15 +12,13 @@ DYLIB_FILENAME			:= $(LIB_NAME).$(VERSION).dylib
 DYLIB				:= $(LIB_DIR)/$(DYLIB_FILENAME)
 LIB_OBJ				:= $(LIB_OBJ_DIR)/$(LIB_NAME).o
 
-CPPFLAGS			:= -MMD -MP -D_FORTIFY_SOURCE=2 -fvisibility=hidden
-CFLAGS				:= -g -Os -fPIE -fPIC -fstack-protector -finline-functions -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-exceptions -fstack-protector-strong -march=native -mtune=native -pedantic-errors
-LDFLAGS				:= -fstack-clash-protection -Wl,-dead_strip,-segalign,$(PAGE_SIZE),-object_path_lto,obj/lto.o,-e,_getargv -flto
+CPPFLAGS			:= -MMD -MP
 
 .PHONY: install dylib clean
 .DEFAULT_GOAL:= $(DYLIB)
 
-$(DYLIB): $(LIB_OBJ) | $(LIB_DIR) $(LIB_OBJ_DIR)
-	$(CC) $(LDFLAGS) -dynamiclib -current_version $(VERSION) -compatibility_version $(COMPAT_VERSION) -Wl,-headerpad_max_install_names,-install_name,@executable_path/../$@ $< -o $@
+$(DYLIB): $(LIB_OBJ) | $(LIB_DIR)
+	$(CC) $(LDFLAGS) -dynamiclib -current_version $(VERSION) -compatibility_version $(COMPAT_VERSION) $< -o $@
 
 install: $(DYLIB)
 	install -d $(PREFIX)/$(LIB_DIR)
