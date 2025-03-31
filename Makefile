@@ -28,6 +28,8 @@ install: $(DYLIB)
 	ln -sf ./$(DYLIB_FILENAME) $(PREFIX)/$(DYLIB:%.$(VERSION).dylib=%.$(COMPAT_VERSION:%.0=%).dylib)
 	install -d $(PREFIX)/include
 	install -m 444 $(wildcard include/*.h) $(PREFIX)/include/
+	install -d $(PREFIX)/$(LIB_DIR)/pkgconfig/
+	install -m 444 getargv.pc $(PREFIX)/$(LIB_DIR)/pkgconfig/
 
 $(LIB_DIR) $(LIB_OBJ_DIR):
 	mkdir -p $@
