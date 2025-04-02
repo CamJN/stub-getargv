@@ -6,7 +6,8 @@ VERSION				:= 0.1
 COMPAT_VERSION			:= $(shell echo $(VERSION) | cut -f1 -d.).0
 
 LIB_NAME			:= libgetargv
-DYLIB_FILENAME			:= $(LIB_NAME).$(VERSION).dylib
+EXTENSION			:= dylib
+DYLIB_FILENAME			:= $(LIB_NAME).$(VERSION).$(EXTENSION)
 DYLIB				:= lib/$(DYLIB_FILENAME)
 LIB_OBJ				:= $(LIB_OBJ_DIR)/$(LIB_NAME).o
 
@@ -22,8 +23,8 @@ install: $(DYLIB)
 	install -d $(PREFIX)/lib
 	install $(DYLIB) $(PREFIX)/$(DYLIB)
 	install_name_tool -id $(PREFIX)/$(DYLIB) $(PREFIX)/$(DYLIB)
-	ln -sf ./$(DYLIB_FILENAME:%.$(VERSION).dylib=%.$(COMPAT_VERSION:%.0=%).dylib) $(PREFIX)/$(DYLIB:%.$(VERSION).dylib=%.dylib)
-	ln -sf ./$(DYLIB_FILENAME) $(PREFIX)/$(DYLIB:%.$(VERSION).dylib=%.$(COMPAT_VERSION:%.0=%).dylib)
+	ln -sf ./$(DYLIB_FILENAME:%.$(VERSION).$(EXTENSION)=%.$(COMPAT_VERSION:%.0=%).$(EXTENSION)) $(PREFIX)/$(DYLIB:%.$(VERSION).$(EXTENSION)=%.$(EXTENSION))
+	ln -sf ./$(DYLIB_FILENAME) $(PREFIX)/$(DYLIB:%.$(VERSION).$(EXTENSION)=%.$(COMPAT_VERSION:%.0=%).$(EXTENSION))
 	install -d $(PREFIX)/include
 	install -m 444 $(wildcard include/*.h) $(PREFIX)/include/
 	install -d $(PREFIX)/lib/pkgconfig/
