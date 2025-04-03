@@ -29,7 +29,7 @@ install: $(DYLIB)
 	install -m 444 $(wildcard include/*.h) $(PREFIX)/include/
 	install -d $(PREFIX)/lib/pkgconfig/
 	install -m 444 getargv.pc $(PREFIX)/lib/pkgconfig/
-	sed -e 's|prefix=.*|prefix=$(PREFIX)|' -i '' $(PREFIX)/lib/pkgconfig/getargv.pc
+	./sed -e 's|prefix=.*|prefix=$(PREFIX)|' -i '' $(PREFIX)/lib/pkgconfig/getargv.pc
 
 lib $(LIB_OBJ_DIR):
 	mkdir -p $@
